@@ -17,7 +17,6 @@ func BindError() *Error {
 	}
 }
 
-
 func ValidationError(errors []string) *Error {
 	return &Error{
 		Code: 400,
