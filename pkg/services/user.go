@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"jwtGoApi/pkg/config"
 	"jwtGoApi/pkg/data/providers"
 	"jwtGoApi/pkg/domain"
@@ -94,6 +95,7 @@ func (svc UserService) Login(user *domain.User) (string, *models.Error) {
 		}
 	}
 
+	fmt.Println(userFound.ID.Hex())
 	token, err := svc.createJwtToken(userFound.ID.Hex())
 	if err != nil {
 		return "", &models.Error{
@@ -138,8 +140,9 @@ func hashPassword(password string) (string, error) {
 }
 
 func (svc UserService) createJwtToken(id string) (string, error) {
-	token := jwt.New(jwt.SigningMethodES256)
+	token := jwt.New(jwt.SigningMethodHS256)
 	expiresIn, err := strconv.ParseInt(svc.cfg.JwtExpires, 10, 64)
+	
 	if err != nil {
 		return "", errors.Wrap(err, "error parsing int")
 	}
@@ -153,6 +156,6 @@ func (svc UserService) createJwtToken(id string) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "error signing token")
 	}
-	
+
 	return signedTkn, nil
 }
