@@ -39,7 +39,7 @@ func (a App) ConfigureRoutes() {
 	a.server.POST("/v1/public/account/login", a.Login)
 	a.server.POST("/v1/public/account/register", a.Register)
 
-	protected := a.server.Group("/v1/api/")
+	protected := a.server.Group("/v1/api")
 
 	middleware := Middleware{config: a.cfg}
 	protected.Use(middleware.Auth)
