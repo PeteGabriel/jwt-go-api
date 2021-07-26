@@ -36,8 +36,18 @@ func New(settings *config.Settings, client *mongo.Client) *App {
 func (a App) ConfigureRoutes() {
 	a.server.GET("/v1/public/healthy", a.HealthCheck)
 
-	a.server.GET("/v1/public/account/login", a.Login)
-	a.server.GET("/v1/public/account/register", a.Register)
+	a.server.POST("/v1/public/account/login", a.Login)
+	a.server.POST("/v1/public/account/register", a.Register)
+
+	protected := a.server.Group("/v1/api/")
+
+	middleware := Middleware{config: a.cfg}
+	protected.Use(middleware.Auth)
+	protected.GET("/secret", func(c echo.Context) error {
+		userId := c.Get("user").(string)
+		return c.String(200, userId)
+	}) 
+	
 }
 
 func (a App) Start() {

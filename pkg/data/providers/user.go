@@ -51,7 +51,7 @@ func (u UserProvider) UsernameExists(username string) (bool, error) {
 		return false, errors.Wrap(err, "Error checking if username exists")
 	}
 	
-	return (usr.Username == username), nil
+	return (usr != nil && usr.Username == username), nil
 }
 
 func (u UserProvider) FindByUsername(username string) (*domain.User, error) {
