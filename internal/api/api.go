@@ -1,27 +1,43 @@
 package api
 
 import (
+	"jwtGoApi/pkg/config"
+	"jwtGoApi/pkg/data/providers"
+	"jwtGoApi/pkg/services"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type App struct {
-	server *echo.Echo
+	server      *echo.Echo
+	userService services.IUserService
+	cfg         *config.Settings
 }
 
-func New() *App {
+func New(settings *config.Settings, client *mongo.Client) *App {
 	server := echo.New()
 
 	//middleware which recovers from panics anywhere in the chain
 	server.Use(middleware.Recover())
+	server.Use(middleware.RequestID())
+
+	userprovider := providers.NewUserProvider(settings, client)
+	userSvc := services.NewUserService(settings, userprovider)
 
 	return &App{
-		server: server,
+		server:      server,
+		userService: userSvc,
+		cfg:         settings,
 	}
 }
 
-func (a App) ConfigureRoutes(){
+func (a App) ConfigureRoutes() {
 	a.server.GET("/v1/public/healthy", a.HealthCheck)
+
+	a.server.GET("/v1/public/account/login", a.Login)
+	a.server.GET("/v1/public/account/register", a.Register)
 }
 
 func (a App) Start() {

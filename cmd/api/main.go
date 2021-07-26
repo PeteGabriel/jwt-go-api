@@ -6,12 +6,12 @@ import (
 	"jwtGoApi/pkg/data"
 )
 
-func main(){
+func main() {
 
 	cfg := config.New()
 	conn := data.NewConnection(cfg)
 	defer conn.Disconnect()
-	
-	app := api.New()
+
+	app := api.New(cfg, conn.Client)
 	app.Start()
 }
