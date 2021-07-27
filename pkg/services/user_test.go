@@ -4,7 +4,7 @@ import (
 	"errors"
 	"jwtGoApi/pkg/config"
 	"jwtGoApi/pkg/domain"
-	usermocks "jwtGoApi/pkg/mocks/data/users"
+	usermocks "jwtGoApi/pkg/mocks/data/providers"
 	"jwtGoApi/pkg/models"
 	"testing"
 
