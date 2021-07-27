@@ -5,6 +5,7 @@ import (
 	"jwtGoApi/pkg/config"
 	"jwtGoApi/pkg/domain"
 	usermocks "jwtGoApi/pkg/mocks/data/users"
+	"jwtGoApi/pkg/models"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -59,4 +60,22 @@ func TestCreateAccount_UsernameSearchThrowsError(t *testing.T){
 	msg := "error happened while trying to check if account/user already exists"
 	assert.Equal(t, msg, response.Message)
 	assert.Equal(t, 500, response.Code)
+}
+
+func TestCreateAccount_Ok(t *testing.T){
+	cfg := &config.Settings{}
+	providerMock := &usermocks.UserProviderMock{}
+	providerMock.UsernameExistsMock = func(username string) (bool, error) {
+		return false, nil
+	}
+	providerMock.CreateAccountMock = func(user *domain.User) error {
+		return nil
+	}
+
+	svc := NewUserService(cfg, providerMock)
+	newUser := &domain.User{Username: "Test", Password: "12345Test"}
+
+	response := svc.CreateAccount(newUser)
+	var err *models.Error // nil
+	assert.Equal(t, err, response)
 }
