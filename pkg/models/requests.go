@@ -63,7 +63,7 @@ func ValidateLoginRequest(c echo.Context) (*domain.User, *Error){
 	}
 
 	if len(logRequest.Username) < 3 {
-		validationErrors = append(validationErrors, "username must be longer than 2 characters")
+		validationErrors = append(validationErrors, "Username must be longer than 2 characters")
 	}
 
 	if len(validationErrors) > 0 {

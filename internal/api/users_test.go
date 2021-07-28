@@ -37,6 +37,7 @@ func TestLogin_Ok(t *testing.T){
 	assert.Equal(t, nil, loginErr)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
+	assert.Equal(t, "{\"Token\":\"some_valid_token\"}\n", rec.Body.String())	
 }
 
 func TestLogin_UserNotFound(t *testing.T){
@@ -99,5 +100,36 @@ loginErr := app.Login(e.NewContext(req, rec))
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 
 	expBody := "{\"message\":\"A validation error occurred.\",\"code\":400,\"name\":\"VALIDATION\",\"validation\":[\"Password must be 8 characters\"]}\n"
+	assert.Equal(t, expBody, rec.Body.String())
+}
+
+func TestLogin_UsernameNotValid(t *testing.T){
+	mock := &userservicemocks.UserServiceMock{}
+	mock.LoginMock = func(user *domain.User) (string, *models.Error){
+		return "", &models.Error{
+			Code: 400,
+			Message: "A validation error occurred.",
+			Name: "VALIDATION",
+		}
+	}
+
+	e := echo.New()
+	app := App{
+		server: e,
+		cfg: &config.Settings{},
+		userService: mock,
+	}
+
+	credentials := `{"username": "T", "password": "89wqrBasfa2"}`
+	req := httptest.NewRequest(http.MethodPost, "/login", strings.NewReader(credentials))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+
+loginErr := app.Login(e.NewContext(req, rec))
+	assert.Equal(t, nil, loginErr)
+	
+	assert.Equal(t, http.StatusBadRequest, rec.Code)
+
+	expBody := "{\"message\":\"A validation error occurred.\",\"code\":400,\"name\":\"VALIDATION\",\"validation\":[\"Username must be longer than 2 characters\"]}\n"
 	assert.Equal(t, expBody, rec.Body.String())
 }
