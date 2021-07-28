@@ -19,6 +19,11 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
+const (
+	passwordValidationError = "Password must be 8 characters"
+	usernameValidationError = "Username must be longer than 2 characters"
+)
+
 func ValidateRegisterRequest(c echo.Context) (*domain.User, *Error){
 
 	regRequest := new(RegisterRequest)
@@ -30,11 +35,11 @@ func ValidateRegisterRequest(c echo.Context) (*domain.User, *Error){
 	var validationErrors []string
 
 	if len(regRequest.Password) < 8 {
-		validationErrors = append(validationErrors, "Password must be 8 characters")
+		validationErrors = append(validationErrors, passwordValidationError)
 	}
 
 	if len(regRequest.Username) < 3 {
-		validationErrors = append(validationErrors, "username must be longer than 2 characters")
+		validationErrors = append(validationErrors, usernameValidationError)
 	}
 
 	if len(validationErrors) > 0 {
@@ -59,11 +64,11 @@ func ValidateLoginRequest(c echo.Context) (*domain.User, *Error){
 	var validationErrors []string
 
 	if len(logRequest.Password) < 8 {
-		validationErrors = append(validationErrors, "Password must be 8 characters")
+		validationErrors = append(validationErrors, passwordValidationError)
 	}
 
 	if len(logRequest.Username) < 3 {
-		validationErrors = append(validationErrors, "Username must be longer than 2 characters")
+		validationErrors = append(validationErrors, usernameValidationError)
 	}
 
 	if len(validationErrors) > 0 {
